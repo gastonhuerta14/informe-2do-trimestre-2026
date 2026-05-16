@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import pandas as pd; xl = pd.ExcelFile\\(r'c:/Users/gasto/Downloads/informe cobranzas/FACTURACION CUADRO ESTADISTICA.xlsx'\\); print\\(xl.sheet_names\\)\")",
+      "Bash(python -c ' *)"
+    ]
+  }
+}

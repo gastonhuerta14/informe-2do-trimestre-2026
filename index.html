@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Control de Gestion - Facturacion 1T 2026</title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+    <div id="loader" class="loader-overlay">
+        <div class="loader-spinner"></div>
+        <p class="loader-text">Cargando datos...</p>
+    </div>
+
+    <header class="corp-header">
+        <div class="container-fluid px-4 py-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <h1 class="corp-title">Dashboard de Control de Gestion</h1>
+                    <p class="corp-subtitle">Facturacion Trimestre 1 &middot; 2026</p>
+                </div>
+                <div class="corp-meta text-end">
+                    <span class="badge-period">Enero - Febrero - Marzo</span>
+                    <p class="corp-update" id="lastUpdate">Actualizado: --</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container-fluid px-4 py-4">
+
+        <!-- KPI CARDS (FLIP) -->
+        <section class="kpi-grid" id="kpiGrid">
+
+            <article class="kpi-card flip-card" data-kpi="totalFacturado">
+                <div class="flip-inner">
+                    <div class="flip-face flip-front">
+                        <div class="kpi-label">
+                            <span>Total Facturado 1T</span>
+                            <span class="flip-icon" title="Voltear">&#8634;</span>
+                        </div>
+                        <div class="kpi-value" data-target="0">$ 0</div>
+                        <div class="kpi-foot">Neto despues de NC emitidas</div>
+                        <div class="kpi-spark" data-spark="totalFacturado"></div>
+                    </div>
+                    <div class="flip-face flip-back">
+                        <div class="kpi-label"><span>Desglose Mensual</span><span class="flip-icon">&#8634;</span></div>
+                        <div class="back-content" data-back="totalFacturado"></div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="kpi-card flip-card" data-kpi="facturacionTotal">
+                <div class="flip-inner">
+                    <div class="flip-face flip-front">
+                        <div class="kpi-label">
+                            <span>Facturacion Bruta</span>
+                            <span class="flip-icon">&#8634;</span>
+                        </div>
+                        <div class="kpi-value" data-target="0">$ 0</div>
+                        <div class="kpi-foot">Sin descontar notas de credito</div>
+                        <div class="kpi-spark" data-spark="facturacionTotal"></div>
+                    </div>
+                    <div class="flip-face flip-back">
+                        <div class="kpi-label"><span>Mix por Concepto</span><span class="flip-icon">&#8634;</span></div>
+                        <div class="back-content" data-back="facturacionTotal"></div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="kpi-card flip-card" data-kpi="ncEmitidas">
+                <div class="flip-inner">
+                    <div class="flip-face flip-front">
+                        <div class="kpi-label">
+                            <span>NC Emitidas</span>
+                            <span class="flip-icon">&#8634;</span>
+                        </div>
+                        <div class="kpi-value negative" data-target="0">$ 0</div>
+                        <div class="kpi-foot" id="ncImpactFoot">Impacto sobre facturacion</div>
+                        <div class="kpi-spark" data-spark="nc"></div>
+                    </div>
+                    <div class="flip-face flip-back">
+                        <div class="kpi-label"><span>Detalle NC</span><span class="flip-icon">&#8634;</span></div>
+                        <div class="back-content" data-back="nc"></div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="kpi-card flip-card" data-kpi="topCliente">
+                <div class="flip-inner">
+                    <div class="flip-face flip-front">
+                        <div class="kpi-label">
+                            <span>Top Cliente</span>
+                            <span class="flip-icon">&#8634;</span>
+                        </div>
+                        <div class="kpi-value" data-target="0">$ 0</div>
+                        <div class="kpi-foot" id="topClienteName">--</div>
+                    </div>
+                    <div class="flip-face flip-back">
+                        <div class="kpi-label"><span>Podio Trimestre</span><span class="flip-icon">&#8634;</span></div>
+                        <div class="back-content" data-back="topCliente"></div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="kpi-card flip-card kpi-ospg" data-kpi="ospg">
+                <div class="flip-inner">
+                    <div class="flip-face flip-front">
+                        <div class="kpi-label">
+                            <span>Costos Operativos OSPG</span>
+                            <span class="flip-icon">&#8634;</span>
+                        </div>
+                        <div class="kpi-value" data-target="0">$ 0</div>
+                        <div class="kpi-foot" id="ospgImpactFoot">Internacion + Ambulatorio</div>
+                        <div class="kpi-spark" data-spark="ospg"></div>
+                    </div>
+                    <div class="flip-face flip-back">
+                        <div class="kpi-label"><span>OSPG por Concepto</span><span class="flip-icon">&#8634;</span></div>
+                        <div class="back-content" data-back="ospg"></div>
+                    </div>
+                </div>
+            </article>
+
+        </section>
+
+        <!-- GRID PRINCIPAL -->
+        <section class="dashboard-grid mt-4">
+
+            <div class="dashboard-col-main">
+
+                <div class="corp-card">
+                    <div class="corp-card-header">
+                        <h2 class="corp-card-title">Detalle por Concepto</h2>
+                        <span class="corp-card-hint">Clic en un concepto para desplegar todos los clientes</span>
+                    </div>
+                    <div class="corp-card-body p-0">
+                        <div class="table-responsive">
+                            <table class="corp-table" id="mainTable">
+                                <thead>
+                                    <tr>
+                                        <th>Concepto</th>
+                                        <th class="text-end">Enero</th>
+                                        <th class="text-end">Febrero</th>
+                                        <th class="text-end">Marzo</th>
+                                        <th class="text-end">Trimestre</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="corp-card mt-4">
+                    <div class="corp-card-header">
+                        <h2 class="corp-card-title">Evolucion Mensual</h2>
+                        <div class="chart-switch" id="chartSwitch" role="tablist">
+                            <button type="button" class="chart-tab is-active" data-view="mensual">Mensual</button>
+                            <button type="button" class="chart-tab" data-view="ospg">OSPG vs Externo</button>
+                            <button type="button" class="chart-tab" data-view="conceptos">Por Concepto</button>
+                            <button type="button" class="chart-tab" data-view="stacked">Stack Trimestre</button>
+                        </div>
+                    </div>
+                    <div class="corp-card-body">
+                        <div class="chart-wrapper">
+                            <canvas id="chartTrend"></canvas>
+                        </div>
+                        <p class="chart-caption" id="chartCaption">Facturacion bruta vs neta y NC por mes</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="dashboard-col-side">
+
+                <div class="corp-card ranking-card">
+                    <div class="corp-card-header">
+                        <h2 class="corp-card-title">Ranking de Clientes</h2>
+                        <span class="corp-card-hint">Top 20 &middot; Trimestre</span>
+                    </div>
+                    <div class="corp-card-body p-0">
+                        <div class="ranking-list" id="rankingList"></div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <footer class="corp-footer">
+            <p>Dashboard Control de Gestion &middot; Migrado desde Google Apps Script</p>
+        </footer>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="/script.js"></script>
+</body>
+</html>
