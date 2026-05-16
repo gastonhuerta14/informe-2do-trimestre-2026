@@ -4,7 +4,8 @@
 (function () {
     'use strict';
 
-    const API_URL = '/api/data';
+    const API_BASE = 'https://informe-cobranzas.onrender.com';
+    const API_URL = API_BASE + '/api/data';
 
     const fmtARS = new Intl.NumberFormat('es-AR', {
         style: 'currency',
