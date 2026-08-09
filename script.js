@@ -4,8 +4,10 @@
 (function () {
     'use strict';
 
-    const API_BASE = 'https://informe-cobranzas-165f.onrender.com';
-    const API_URL = API_BASE + '/api/data';
+    // Mismo origen que sirve la pagina: en local apunta al uvicorn de esta
+    // maquina, y desplegado apunta al backend que la hostea. Fijar un host
+    // absoluto hace que el front lea datos de otro servidor.
+    const API_URL = '/api/data';
 
     const fmtARS = new Intl.NumberFormat('es-AR', {
         style: 'currency',
@@ -353,9 +355,9 @@
             const negClass = (v) => (v < 0 ? ' row-negative' : '');
             tr.innerHTML = `
                 <td><span class="cell-concepto">${CHEVRON_SVG}<span>${row.concepto}</span></span></td>
-                <td class="text-end${negClass(row.enero)}">${formatCurrency(row.enero)}</td>
-                <td class="text-end${negClass(row.febrero)}">${formatCurrency(row.febrero)}</td>
-                <td class="text-end${negClass(row.marzo)}">${formatCurrency(row.marzo)}</td>
+                <td class="text-end${negClass(row.abril)}">${formatCurrency(row.abril)}</td>
+                <td class="text-end${negClass(row.mayo)}">${formatCurrency(row.mayo)}</td>
+                <td class="text-end${negClass(row.junio)}">${formatCurrency(row.junio)}</td>
                 <td class="text-end${negClass(row.trimestre)}"><strong>${formatCurrency(row.trimestre)}</strong></td>
             `;
             tbody.appendChild(tr);
@@ -437,10 +439,10 @@
         const ospgHtml = hasOspg && ospg ? `
             <div class="ospg-banner" data-ospg>
                 <span class="ospg-tag">Costos OSPG</span>
-                <div class="ospg-cell"><span class="ospg-key">Enero</span><span class="ospg-val">${fmtCompact(ospg.enero || 0)}</span></div>
-                <div class="ospg-cell"><span class="ospg-key">Febrero</span><span class="ospg-val">${fmtCompact(ospg.febrero || 0)}</span></div>
-                <div class="ospg-cell"><span class="ospg-key">Marzo</span><span class="ospg-val">${fmtCompact(ospg.marzo || 0)}</span></div>
-                <div class="ospg-cell"><span class="ospg-key">Trimestre</span><span class="ospg-val">${fmtCompact((ospg.enero||0)+(ospg.febrero||0)+(ospg.marzo||0))}</span></div>
+                <div class="ospg-cell"><span class="ospg-key">Abril</span><span class="ospg-val">${fmtCompact(ospg.abril || 0)}</span></div>
+                <div class="ospg-cell"><span class="ospg-key">Mayo</span><span class="ospg-val">${fmtCompact(ospg.mayo || 0)}</span></div>
+                <div class="ospg-cell"><span class="ospg-key">Junio</span><span class="ospg-val">${fmtCompact(ospg.junio || 0)}</span></div>
+                <div class="ospg-cell"><span class="ospg-key">Trimestre</span><span class="ospg-val">${fmtCompact((ospg.abril||0)+(ospg.mayo||0)+(ospg.junio||0))}</span></div>
             </div>
         ` : '';
 

@@ -1,0 +1,10 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Archivos temporales de Excel (el "~$" lo crea Excel mientras el libro
+# esta abierto; no es un archivo de datos)
+~$*.xlsx
+~$*.xls
