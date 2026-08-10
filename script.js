@@ -7,7 +7,7 @@
     // Mismo origen que sirve la pagina: en local apunta al uvicorn de esta
     // maquina, y desplegado apunta al backend que la hostea. Fijar un host
     // absoluto hace que el front lea datos de otro servidor.
-    const API_URL = 'https://informe-2do-trimestre-2026.onrender.com';
+    const API_URL = 'https://informe-2do-trimestre-2026.onrender.com/api/data';
 
     const fmtARS = new Intl.NumberFormat('es-AR', {
         style: 'currency',
