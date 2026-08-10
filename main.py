@@ -51,6 +51,18 @@ app.add_middleware(
 )
 
 
+@app.middleware("http")
+async def sin_cache(request, call_next):
+    """
+    El dashboard es chico y se edita seguido: que el navegador reuse un
+    script.js viejo genera errores que parecen del backend (por ejemplo un
+    fetch a la URL equivocada devolviendo HTML). Se fuerza revalidacion.
+    """
+    response = await call_next(request)
+    response.headers["Cache-Control"] = "no-store, must-revalidate"
+    return response
+
+
 def _strip_accents(text: str) -> str:
     if not isinstance(text, str):
         return ""

@@ -4,10 +4,15 @@
 (function () {
     'use strict';
 
-    // Mismo origen que sirve la pagina: en local apunta al uvicorn de esta
-    // maquina, y desplegado apunta al backend que la hostea. Fijar un host
-    // absoluto hace que el front lea datos de otro servidor.
-    const API_URL = '/api/data';
+    // En local el mismo uvicorn sirve la pagina y la API, asi que alcanza la
+    // ruta relativa. Si el frontend se publica aparte (Vercel), el backend
+    // vive en otro dominio y hay que apuntarlo explicitamente. Elegir segun
+    // el host evita tener que editar el archivo para cada entorno.
+    const LOCAL_HOSTS = ['localhost', '127.0.0.1', '[::1]', ''];
+    const API_BASE = LOCAL_HOSTS.includes(location.hostname)
+        ? ''
+        : 'https://informe-2do-trimestre-2026.onrender.com';
+    const API_URL = API_BASE + '/api/data';
 
     const fmtARS = new Intl.NumberFormat('es-AR', {
         style: 'currency',

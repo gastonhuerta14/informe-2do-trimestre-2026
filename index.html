@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
           rel="stylesheet">
-    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/style.css?v=2" />
 </head>
 <body>
     <div id="loader" class="loader-overlay">
@@ -201,6 +201,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-    <script src="/script.js"></script>
+    <!-- El ?v= cambia la URL del recurso: obliga al navegador a bajar la
+         version nueva en vez de reusar la cacheada. Subir el numero al
+         tocar script.js o style.css. -->
+    <script src="/script.js?v=2"></script>
 </body>
 </html>
