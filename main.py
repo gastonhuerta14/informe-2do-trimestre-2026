@@ -20,6 +20,7 @@ EXCEL_PATH = BASE_DIR / "FACTURACION CUADRO ESTADISTICA ABRIL-JUNIO.xlsx"
 MESES = ["abril", "mayo", "junio"]
 MES_LABELS = {"abril": "ABRIL", "mayo": "MAYO", "junio": "JUNIO"}
 
+DETALLE_SHEET = "DETALLE"
 OSPG_SHEET = "DETALLE 2"
 
 # Las hojas DETALLE no siempre traen las mismas columnas: la exportacion nueva
@@ -188,36 +189,19 @@ def _find_sheet(nombre: str) -> str | None:
     return None
 
 
-def _read_ospg_operativo() -> tuple[dict, str | None, dict]:
+def _scan_ospg(df: pd.DataFrame) -> tuple[dict, dict]:
     """
-    Costos operativos OSPG - se leen desde la hoja 'DETALLE 2' filtrando
-    las filas cuyo cliente sea exactamente 'OSPG' (facturacion interna a
-    la misma obra social, separada del resto de clientes externos).
+    Recorre una hoja de detalle y acumula las filas de costos OSPG.
 
-    En esas filas el periodo viene prefijado ('OSPG ABRIL 2026.') y el
-    comprobante queda vacio, por eso el mes se deduce igual que en DETALLE.
-
-    Retorna ({ baseKey: {mes: monto} }, hoja_usada, diagnostico). Solo
-    INTERNACION y AMBULATORIO: son los unicos conceptos OSPG que trae la
-    fuente. Si la hoja todavia no existe devuelve ceros y hoja_usada = None.
-
-    El diagnostico lista las filas OSPG que se descartaron, para que un dato
-    mal cargado se vea en /api/data en vez de desaparecer en un cero.
+    Devuelve ({ baseKey: {mes: monto} }, diagnostico). El diagnostico lista
+    las filas OSPG descartadas con su numero de fila del Excel, para que un
+    dato mal cargado se vea en /api/data en vez de desaparecer en un cero.
     """
     ospg = {
         "FACTURACION INTERNACION": {m: 0.0 for m in MESES},
         "FACTURACION AMBULATORIO": {m: 0.0 for m in MESES},
     }
     diagnostico: dict = {"filasLeidas": 0, "omitidas": []}
-
-    hoja = _find_sheet(OSPG_SHEET)
-    if hoja is None:
-        # Todavia no se cargaron los costos operativos: ceros, sin romper.
-        return ospg, None, diagnostico
-
-    # Si la hoja existe pero esta mal armada conviene que el error se vea,
-    # en lugar de mostrar un cero que parece un dato real.
-    df = _read_detalle(hoja)
 
     def omitir(fila: int, motivo: str, detalle) -> None:
         diagnostico["omitidas"].append(
@@ -258,7 +242,41 @@ def _read_ospg_operativo() -> tuple[dict, str | None, dict]:
         ospg[base][mes] += monto
         diagnostico["filasLeidas"] += 1
 
-    return ospg, hoja, diagnostico
+    return ospg, diagnostico
+
+
+def _read_ospg_operativo() -> tuple[dict, str | None, dict]:
+    """
+    Costos operativos OSPG: filas cuya razon social es exactamente 'OSPG'
+    (facturacion interna a la misma obra social, separada del resto de
+    clientes externos). En esas filas el periodo viene prefijado
+    ('OSPG ABRIL') y el comprobante queda vacio.
+
+    Pueden estar en una hoja aparte ('DETALLE 2', como en el 1T) o
+    intercaladas en la propia 'DETALLE'. Se usa la primera hoja que traiga
+    filas OSPG y nunca las dos, para no duplicar montos. No hay riesgo de
+    contar dos veces contra la facturacion externa porque
+    _build_detalle_aggregates ya excluye a los clientes OSPG.
+
+    Retorna ({ baseKey: {mes: monto} }, hoja_usada, diagnostico), con
+    hoja_usada = None si todavia no se cargaron los costos.
+    """
+    for nombre in (OSPG_SHEET, DETALLE_SHEET):
+        hoja = _find_sheet(nombre)
+        if hoja is None:
+            continue
+
+        # Si la hoja esta mal armada conviene que el error se vea, en lugar
+        # de mostrar un cero que parece un dato real.
+        ospg, diagnostico = _scan_ospg(_read_detalle(hoja))
+        if diagnostico["filasLeidas"] or diagnostico["omitidas"]:
+            return ospg, hoja, diagnostico
+
+    vacio = {
+        "FACTURACION INTERNACION": {m: 0.0 for m in MESES},
+        "FACTURACION AMBULATORIO": {m: 0.0 for m in MESES},
+    }
+    return vacio, None, {"filasLeidas": 0, "omitidas": []}
 
 
 def _build_detalle_aggregates() -> tuple[dict, dict, dict]:
@@ -269,7 +287,7 @@ def _build_detalle_aggregates() -> tuple[dict, dict, dict]:
                           facturacionTotal, totalFacturado} }
       - rankingGlobal: [ {cliente, total} ordenado desc (sin NCs) ]
     """
-    df = _read_detalle("DETALLE")
+    df = _read_detalle(_find_sheet(DETALLE_SHEET) or DETALLE_SHEET)
 
     desglose: dict[str, dict[str, float]] = {k: {} for k in BASE_KEYS}
     stats: dict[str, dict[str, float]] = {
